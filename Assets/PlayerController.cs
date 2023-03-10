@@ -2,28 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public class PlayerController : MonoBehaviour
 {
     Rigidbody rb;
-
-    //wartosc wczytana z klawiatury i/lub joysticka
     Vector2 input;
-
-    //mno¿nik przyspieszenia statku
     public float enginePower = 10;
-
-    //mno¿nik sterowania
     public float gyroPower = 2;
-
     private CameraScript cs;
-
-    //miejsce na prefab pocisku
     public GameObject bulletPrefab;
-    //okresl miejsca spawnowania pocisków
     public Transform gunLeft, gunRight;
-
-    //predkosc poczatkowa pocisku
     public float bulletSpeed = 30;
+
+    public AudioClip gunSound;
+    AudioSource audioSource;
 
     // Start is called before the first frame update
     void Start()
@@ -33,6 +25,8 @@ public class PlayerController : MonoBehaviour
         input = Vector2.zero;
         gunLeft = transform.Find("GunLeft").transform;
         gunRight = transform.Find("GunRight").transform;
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -49,7 +43,6 @@ public class PlayerController : MonoBehaviour
         //teleportuj statek jeœli wyjdzie z ekranu
         if(Mathf.Abs(transform.position.x) > cs.gameWidth / 2)
         {
-            //wylecieliœmy z ekranu w poziomie - teleportuj na druga strone
             Vector3 newPosition = new Vector3(transform.position.x  * (-0.99f), 
                                                 0, 
                                                 transform.position.z);
@@ -57,10 +50,9 @@ public class PlayerController : MonoBehaviour
         }
         if (Mathf.Abs(transform.position.z) > cs.gameHeight / 2)
         {
-            //wylecieliœmy z ekranu w pionie - teleportuj na druga strone
-            Vector3 newPosition = new Vector3(transform.position.x,
-                                                0,
-                                                transform.position.z * (-0.99f));
+            Vector3 newPosition = new Vector3(transform.position.x, 0, transform.position.z * (-0.99f));
+
+
             transform.position = newPosition;
         }
         if (Input.GetKeyDown(KeyCode.Space))
@@ -74,22 +66,15 @@ public class PlayerController : MonoBehaviour
 
     void Fire()
     {
-        //zespawnuj pocisk
-        GameObject leftBullet = Instantiate(bulletPrefab, gunLeft.position, 
-                                                        Quaternion.identity);
-        //zmien predkoc pocisku
-        leftBullet.GetComponent<Rigidbody>().AddForce(transform.forward * bulletSpeed, 
-                                                        ForceMode.VelocityChange);
-        //zniszcz pocisk po 5 sekundach
+        audioSource.PlayOneShot(gunSound, 1F);
+        GameObject leftBullet = Instantiate(bulletPrefab, gunLeft.position, Quaternion.identity);
+
+        leftBullet.GetComponent<Rigidbody>().AddForce(transform.forward * bulletSpeed, ForceMode.VelocityChange);
+
         Destroy(leftBullet, 5);
 
-        //zespawnuj pocisk
-        GameObject rightBullet = Instantiate(bulletPrefab, gunRight.position,
-                                                        Quaternion.identity);
-        //zmien predkoc pocisku
-        rightBullet.GetComponent<Rigidbody>().AddForce(transform.forward * bulletSpeed,
-                                                        ForceMode.VelocityChange);
-        //zniszcz pocisk po 5 sekundach
+        GameObject rightBullet = Instantiate(bulletPrefab, gunRight.position, Quaternion.identity);
+        rightBullet.GetComponent<Rigidbody>().AddForce(transform.forward * bulletSpeed, ForceMode.VelocityChange);
         Destroy(rightBullet, 5);
     }
 }

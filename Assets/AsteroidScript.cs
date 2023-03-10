@@ -12,11 +12,9 @@ public class AsteroidScript : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
         rb = GetComponent<Rigidbody>();
         Vector3 movementVector = player.transform.position - transform.position;
-        //stabilizujemy prêdkoœæ asteroidy
         movementVector = movementVector.normalized * 10;
         rb.AddForce(movementVector, ForceMode.VelocityChange);
         rb.AddTorque(new Vector3(Random.Range(0, 90), Random.Range(0, 90), Random.Range(0, 90)));
-        //rozwi¹zanie tymczasowe, finalnie despawn po opuszczeniu ekranu
         Destroy(gameObject, 5);
     }
 
@@ -24,5 +22,13 @@ public class AsteroidScript : MonoBehaviour
     void Update()
     {
         
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        GameObject other= collision.gameObject;
+        if (other.CompareTag("Player"))
+        {
+            GameObject.Find("LevelManager").GetComponent<LevelManager>().GameOver();
+        }
     }
 }
