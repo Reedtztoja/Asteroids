@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
         gunRight = transform.Find("GunRight").transform;
 
         audioSource = GetComponent<AudioSource>();
+        //xd
     }
 
     // Update is called once per frame
